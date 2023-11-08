@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 
 public class Grid 
@@ -8,13 +9,15 @@ public class Grid
     private int height;
     private float cellSize;
     private int[,] gridArray;
-    private TextMesh[,] debugTextarray; 
+    private TextMesh[,] debugTextarray;
+    private Vector3 orginPosition;
 
-    public Grid(int width, int height, float cellSize)
+    public Grid(int width, int height, float cellSize, Vector3 orginPosition)
     {
         this.width = width;
         this.height = height;
-        this .cellSize = cellSize;
+        this.cellSize = cellSize;
+        this.orginPosition = orginPosition;
 
         gridArray = new int[width, height];
         debugTextarray = new TextMesh[width, height];
@@ -37,13 +40,13 @@ public class Grid
 
     private Vector3 GetWorldPosition(int x, int y)
     {
-        return new Vector3(x, y) * cellSize;
+        return new Vector3(x, y) * cellSize + orginPosition;
     }
 
     private void GetXY(Vector3 worldPosition, out int x, out int y)
     {
-        x = Mathf.FloorToInt(worldPosition.x/ cellSize);
-        y = Mathf.FloorToInt(worldPosition.y/ cellSize);
+        x = Mathf.FloorToInt((worldPosition - orginPosition).x / cellSize);
+        y = Mathf.FloorToInt((worldPosition - orginPosition).y/ cellSize);
     }
 
     public void SetValue(int x, int y , int value)
@@ -60,5 +63,24 @@ public class Grid
         int x, y;
         GetXY(worldPosition, out x, out y);
         SetValue(x, y, value);
+    }
+
+    public int GetValue(int x, int y)
+    {
+        if(x >= 0 && y >= 0 && x < width && y < height )
+        {
+            return gridArray[x, y];
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    public int GetValue(Vector3 worldPosition)
+    {
+        int x, y;
+        GetXY(worldPosition, out x , out y);
+        return GetValue(x, y);
     }
 }
